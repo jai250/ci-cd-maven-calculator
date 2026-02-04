@@ -15,7 +15,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/jai250/maven-calculator.git',
-                    credentialsId: 'side'
+                    credentialsId: 'github'
             }
         }
 
