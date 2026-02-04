@@ -1,26 +1,39 @@
 pipeline {
-	agent any
-	stages {
-		stage('Checkout') {
-			steps {
-				checkout([
-					$class: 'GitSCM',
-					branches: [[name: '*/main']],
-					   userRemoteConfigs: [[
-						   url: 'https://github.com/jai250/ci-cd-maven-calculator.git',
-						   credentialsId: 'side'
-					   ]]
-				])
-			}
-		}
+    agent any
 
-        stage('check') {
+    tools {
+        maven 'M3'
+    }
+
+    environment {
+        SONAR_SCANNER_HOME = tool 'SonarScanner'
+    }
+
+    stages {
+
+        stage('Checkout Code') {
             steps {
-                sh '''
-                    pwd
-                    ls -lrta
-                '''
+                git branch: 'main',
+                    url: 'https://github.com/<your-username>/maven-calculator.git'
             }
-        }        
-	}
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=maven-calculator \
+                    -Dsonar.projectName="Maven Calculator"
+                    '''
+                }
+            }
+        }
+    }
 }
