@@ -11,6 +11,14 @@ pipeline {
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/<your-username>/maven-calculator.git'
+                    credentialsId: 'github'
+            }
+        }
+
         stage('Build & Test') {
             steps {
                 sh 'mvn clean test'
